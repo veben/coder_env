@@ -1,0 +1,11 @@
+services:
+  download_model:
+    image: curlimages/curl:8.10.1
+    entrypoint: ["curl", "$OLLAMA_NAME:$OLLAMA_PORT/api/pull", "-d", '{"name": "$MODEL_NAME"}']
+    environment:
+      - MODEL_NAME
+      - OLLAMA_NAME
+      - OLLAMA_PORT
+    depends_on:
+      ollama_service:
+        condition: service_started

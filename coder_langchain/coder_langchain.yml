@@ -1,0 +1,35 @@
+services:
+  coder_langchain:
+    profiles: [ langchain ]
+    entrypoint: [ "code-server", "--auth", "none", "--host", "0.0.0.0", "--port", "${LANGCHAIN_ENV_PORT}", "/coder_langchain/workspace" ]
+    # HTTPS entrypoint
+    #entrypoint: ["code-server", "--cert", "/coder_langchain/certs/${TLS_CERT}", "--cert-key", "/coder_langchain/certs/${TLS_CERT_KEY}", "--auth", "none", "--host", "0.0.0.0", "--port", "${LANGCHAIN_ENV_PORT}", "/coder_langchain/workspace"]
+    environment: &environment-langchain
+      - LANGCHAIN_ENV_PORT=${LANGCHAIN_ENV_PORT}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - MODEL_NAME=${MODEL_NAME}
+      - XDG_DATA_HOME=/coder_langchain/.config
+      # - TLS_CERT=${TLS_CERT}
+      # - TLS_CERT_KEY=${TLS_CERT_KEY}
+    build: &build-langchain
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - CODER_VERSION=${CODER_VERSION}
+        - CODER_ARCH=${CODER_ARCH}
+    depends_on:
+      ollama_service:
+        condition: service_started
+    volumes: &volumes-langchain
+      - ../coder_langchain:/coder_langchain
+    ports:
+      - ${LANGCHAIN_ENV_PORT}:${LANGCHAIN_ENV_PORT}
+
+  coder_langchain-tasks:
+    profiles: [ langchain ]
+    depends_on:
+      - coder_langchain
+    entrypoint: [ "/coder_langchain/.tasks/init.sh" ]
+    environment: *environment-langchain
+    build: *build-langchain
+    volumes: *volumes-langchain

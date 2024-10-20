@@ -1,0 +1,10 @@
+services:
+  ollama_service:
+    container_name: ollama_service
+    image: ollama/ollama:0.3.13
+    volumes:
+      - ../ollama:/root/.ollama
+    environment:
+      - OLLAMA_PORT:${OLLAMA_PORT}
+    ports:
+      - ${OLLAMA_PORT}:${OLLAMA_PORT}

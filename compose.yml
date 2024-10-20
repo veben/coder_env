@@ -1,0 +1,7 @@
+include:
+  # Start Ollama
+  - ollama_service/ollama.yml
+  # Download model
+  - models_download/tinydolphin_download.yml
+  # Start the Coder langchain dev env
+  - coder_langchain/coder_langchain.yml
